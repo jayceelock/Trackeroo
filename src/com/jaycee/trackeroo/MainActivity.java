@@ -1,6 +1,7 @@
 package com.jaycee.trackeroo;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -39,6 +40,7 @@ public class MainActivity extends Activity
 		
 		if (id == R.id.action_settings) 
 		{
+			startActivity(new Intent(this, SettingsActivity.class));
 			return true;
 		}
 		

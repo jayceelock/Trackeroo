@@ -8,7 +8,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -17,9 +16,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.Fragment;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -82,7 +83,12 @@ public class SpecialsFragment extends Fragment
 		if(id == R.id.action_refresh)
 		{
 			FetchSpecialsTask specialsTask = new FetchSpecialsTask();
-			specialsTask.execute("Stellenbosch");
+			
+			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            String location = prefs.getString(getString(R.string.pref_location_key),
+                    getString(R.string.pref_location_default));
+            
+			specialsTask.execute("stellenbosch");
 
 			return true;
 		}
@@ -118,65 +124,36 @@ public class SpecialsFragment extends Fragment
 			return highLowStr;
 		}
 		
-		/**
-		 * Take the String representing the complete forecast in JSON Format and
-		 * pull out the data we need to construct the Strings needed for the wireframes.
-		 *
-		 * Fortunately parsing is easy: constructor takes the JSON string and converts it
-		 * into an Object hierarchy for us.
-		 */
-		private String[] getWeatherDataFromJson(String forecastJsonStr, int numDays) throws JSONException 
+		private String[] getSpecialsFromJson(String jsonString) throws JSONException
 		{
-			// These are the names of the JSON objects that need to be extracted.
-			final String OWM_LIST = "list";
-			final String OWM_WEATHER = "weather";
-			final String OWM_TEMPERATURE = "temp";
-			final String OWM_MAX = "max";
-			final String OWM_MIN = "min";
-			final String OWM_DATETIME = "dt";
-			final String OWM_DESCRIPTION = "main";
+			final String OWM_RESTAURANT_NAME = "restaurant_name";
 			
-			JSONObject forecastJson = new JSONObject(forecastJsonStr);
-			JSONArray weatherArray = forecastJson.getJSONArray(OWM_LIST);
-			String[] resultStrs = new String[numDays];
+			JSONArray specialsJson = new JSONArray(jsonString);
 			
-			for(int i = 0; i < weatherArray.length(); i++) 
+			String[] returnResult = new String[specialsJson.length()];
+			
+			for(int i = 0; i < specialsJson.length(); i ++)
 			{
-				// For now, using the format "Day, description, hi/low"
-				String day;
-				String description;
-				String highAndLow;
+				JSONObject restaurantObject = specialsJson.getJSONObject(i);
+				JSONArray restaurantDetailsArray = restaurantObject.getJSONArray("details");
 				
-				// Get the JSON object representing the day
-				JSONObject dayForecast = weatherArray.getJSONObject(i);
+				String restaurantName = restaurantObject.getString("restaurant");
+				restaurantName = Character.toUpperCase(restaurantName.charAt(0)) + restaurantName.substring(1);
 				
-				// The date/time is returned as a long. We need to convert that
-				// into something human-readable, since most people won't read "1400356800" as
-				// "this saturday".
-				long dateTime = dayForecast.getLong(OWM_DATETIME);
-				day = getReadableDateString(dateTime);
+				String price = restaurantDetailsArray.getString(0);
+				String descrip = restaurantDetailsArray.getString(1);
 				
-				// description is in a child array called "weather", which is 1 element long.
-				JSONObject weatherObject = dayForecast.getJSONArray(OWM_WEATHER).getJSONObject(0);
-				description = weatherObject.getString(OWM_DESCRIPTION);
+				returnResult[i] = "Restaurant: " + restaurantName + "\nPrice: R" + price + "\n" + descrip;
 				
-				// Temperatures are in a child object called "temp". Try not to name variables
-				// "temp" when working with temperature. It confuses everybody.
-				JSONObject temperatureObject = dayForecast.getJSONObject(OWM_TEMPERATURE);
-				double high = temperatureObject.getDouble(OWM_MAX);
-				double low = temperatureObject.getDouble(OWM_MIN);
-				highAndLow = formatHighLows(high, low);
-				resultStrs[i] = day + " - " + description + " - " + highAndLow;
+				//Log.v(LOG_TAG, "Forecast entry: " + returnResult[i]);
 			}
 			
-			for (String s : resultStrs) 
-			{
-				Log.v(LOG_TAG, "Forecast entry: " + s);
-			}
+			//Log.v(LOG_TAG, "Forecast entry: " + specialsJson.length());
+			//String[] awe = {"hello", "daar"};
 			
-			return resultStrs;
+			return returnResult;
 		}
-		
+
 		@Override
 		protected String[] doInBackground(String... params) 
 		{
@@ -192,33 +169,35 @@ public class SpecialsFragment extends Fragment
 			BufferedReader reader = null;
 			
 			// Will contain the raw JSON response as a string.
-			String forecastJsonStr = null;
-			String format = "json";
-			String units = "metric";
+			String specialJsonStr = null;
+			String day = "monday";
+			String location = "stellenbosch";
 			
-			int numDays = 7;
+			//int numDays = 7;
 			
 			try 
 			{
 				// Construct the URL for the OpenWeatherMap query
 				// Possible parameters are avaiable at OWM's forecast API page, at
 				// http://openweathermap.org/API#forecast
-				final String FORECAST_BASE_URL = "http://api.openweathermap.org/data/2.5/forecast/daily?";
-				final String QUERY_PARAM = "q";
-				final String FORMAT_PARAM = "mode";
-				final String UNITS_PARAM = "units";
-				final String DAYS_PARAM = "cnt";
+				//final String FORECAST_BASE_URL = "http://api.openweathermap.org/data/2.5/forecast/daily?";
+				//final String QUERY_PARAM = "q";
+				//final String FORMAT_PARAM = "mode";
+				//final String UNITS_PARAM = "units";
+				//final String DAYS_PARAM = "cnt";
 				
-				Uri builtUri = Uri.parse(FORECAST_BASE_URL).buildUpon()
-						.appendQueryParameter(QUERY_PARAM, params[0])
-						.appendQueryParameter(FORMAT_PARAM, format)
-						.appendQueryParameter(UNITS_PARAM, units)
-						.appendQueryParameter(DAYS_PARAM, Integer.toString(numDays))
+				final String SPECIAL_BASE_URL = "http://trackeroo-specials.appspot.com/";
+				final String DAY_PARAM = "day";
+				final String LOCATION_PARAM = "loc";
+				
+				Uri builtUri = Uri.parse(SPECIAL_BASE_URL).buildUpon()
+						.appendQueryParameter(DAY_PARAM, day)
+						.appendQueryParameter(LOCATION_PARAM, location)
 						.build();
 				
 				URL url = new URL(builtUri.toString());
 				Log.v(LOG_TAG, "Built URI " + builtUri.toString());
-				
+				//Toast.makeText(getActivity(), "BLAH", Toast.LENGTH_LONG).show();
 				// Create the request to OpenWeatherMap, and open the connection
 				urlConnection = (HttpURLConnection) url.openConnection();
 				urlConnection.setRequestMethod("GET");
@@ -251,8 +230,8 @@ public class SpecialsFragment extends Fragment
 					return null;
 				}
 				
-				forecastJsonStr = buffer.toString();
-				Log.v(LOG_TAG, "Forecast string: " + forecastJsonStr);
+				specialJsonStr = buffer.toString();
+				Log.v(LOG_TAG, "Forecast string: " + specialJsonStr);
 				
 			} 
 			
@@ -288,7 +267,12 @@ public class SpecialsFragment extends Fragment
 			
 			try 
 			{
-				return getWeatherDataFromJson(forecastJsonStr, numDays);
+				//return getWeatherDataFromJson(forecastJsonStr, numDays);
+				
+				return getSpecialsFromJson(specialJsonStr);
+				
+				//String[] meh = {"blah", "blah"};
+				//return meh;
 			}
 			
 			catch (JSONException e) 
@@ -308,9 +292,9 @@ public class SpecialsFragment extends Fragment
 			{
 				mForecastAdapter.clear();
 				
-				for(String dayForecastStr : result) 
+				for(String specialStr : result) 
 				{
-					mForecastAdapter.add(dayForecastStr);
+					mForecastAdapter.add(specialStr);
 				}
 				// New data is back from the server. Hooray!
 			}
