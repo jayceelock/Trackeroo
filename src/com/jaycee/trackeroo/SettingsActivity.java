@@ -22,6 +22,7 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
 		// TODO: Add preference
 		
 		bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_location_key)));
+		bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_day_key)));
 	}
 
 	/**

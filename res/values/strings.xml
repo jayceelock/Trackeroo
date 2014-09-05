@@ -3,7 +3,7 @@
 
     <string name="app_name">Trackeroo</string>
     <string name="action_settings">Settings</string>
-    
+
     <!-- Menu label to fetch updated weather info from the server -->
     <string name="action_refresh" translatable="false">Refresh</string>
     <string name="title_activity_detail">Details</string>
@@ -16,6 +16,33 @@
     <string name="pref_location_key" translatable="false">location</string>
 
     <!-- Default postal code for location preference [CHAR LIMIT=NONE] -->
-    <string name="pref_location_default" translatable="false">94043</string>
+    <string name="pref_location_default" translatable="false">Stellenbosch</string>
+    
+        <!-- Label for the temperature units preference [CHAR LIMIT=30] -->
+    <string name="pref_day_label">Day Selection</string>
+    
+    <!-- Default day for day preference [CHAR LIMIT=NONE] -->
+    <string name="pref_day_default" translatable="false">Monday</string>
+
+    <!-- Label for the day options -->
+    <string name="pref_day_label_monday">Monday</string>
+    <string name="pref_day_label_tuesday">Tuesday</string>
+    <string name="pref_day_label_wednesday">Wednesday</string>
+    <string name="pref_day_label_thursday">Thursday</string>
+    <string name="pref_day_label_friday">Friday</string>
+    <string name="pref_day_label_saturday">Saturday</string>
+    <string name="pref_day_label_sunday">Sunday</string>
+
+    <!-- Key name for temperature unit preference in SharedPreferences [CHAR LIMIT=NONE] -->
+    <string name="pref_day_key" translatable="false">days</string>
+
+    <!-- Value in SharedPreferences for the day selection unit option [CHAR LIMIT=NONE] -->
+    <string name="pref_day_monday" translatable="false">monday</string>
+    <string name="pref_day_tuesday" translatable="false">tuesday</string>
+    <string name="pref_day_wednesday" translatable="false">wednesday</string>
+    <string name="pref_day_thursday" translatable="false">thursday</string>
+    <string name="pref_day_friday" translatable="false">friday</string>
+    <string name="pref_day_saturday" translatable="false">saturday</string>
+    <string name="pref_day_sunday" translatable="false">sunday</string>
 
 </resources>

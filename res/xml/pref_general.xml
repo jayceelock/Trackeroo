@@ -10,4 +10,11 @@
         android:singleLine="true"
         android:title="@string/pref_location_label" />
 
+    <ListPreference
+        android:defaultValue="@string/pref_day_monday"
+        android:entries="@array/pref_days_options"
+        android:entryValues="@array/pref_days_values"
+        android:key="@string/pref_day_key"
+        android:title="@string/pref_day_label" />
+
 </PreferenceScreen>
