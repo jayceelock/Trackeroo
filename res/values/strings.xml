@@ -17,10 +17,10 @@
 
     <!-- Default postal code for location preference [CHAR LIMIT=NONE] -->
     <string name="pref_location_default" translatable="false">Stellenbosch</string>
-    
-        <!-- Label for the temperature units preference [CHAR LIMIT=30] -->
+
+    <!-- Label for the temperature units preference [CHAR LIMIT=30] -->
     <string name="pref_day_label">Day Selection</string>
-    
+
     <!-- Default day for day preference [CHAR LIMIT=NONE] -->
     <string name="pref_day_default" translatable="false">Monday</string>
 
@@ -44,5 +44,7 @@
     <string name="pref_day_friday" translatable="false">friday</string>
     <string name="pref_day_saturday" translatable="false">saturday</string>
     <string name="pref_day_sunday" translatable="false">sunday</string>
+    <string name="title_activity_restaurant_detail">RestaurantDetailActivity</string>
+    <string name="hello_world">Hello world!</string>
 
 </resources>

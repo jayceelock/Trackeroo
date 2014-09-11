@@ -1,7 +1,6 @@
 package com.jaycee.trackeroo;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -39,8 +38,7 @@ public class SpecialsFragment extends Fragment
 	private ArrayAdapter<String> mSpecialsAdapter;
 	private final String LOG_TAG = FetchSpecialsTask.class.getSimpleName();
 	
-	private double[] mapLong;
-	private double[] mapLat;
+	private String[] restaurantList;
 
 	public SpecialsFragment()
 	{
@@ -72,9 +70,11 @@ public class SpecialsFragment extends Fragment
 				weekForecast);
 
 		View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-
+		
 		ListView listView = (ListView)rootView.findViewById(R.id.listview_specials);
 		listView.setAdapter(mSpecialsAdapter);
+		
+		
 		listView.setOnItemClickListener(new AdapterView.OnItemClickListener() 
 		{
 			@Override
@@ -85,14 +85,15 @@ public class SpecialsFragment extends Fragment
 				Bundle extras = new Bundle();
 				
 				extras.putString("EXTRA_SPECIALS", specials);
-				extras.putDouble("EXTRA_LAT", mapLat[position]);
-				extras.putDouble("EXTRA_LONG", mapLong[position]);
+				extras.putString("EXTRA_RESTAURANT", restaurantList[position]);
+				//extras.putDouble("EXTRA_LAT", mapLat[position]);
+				//extras.putDouble("EXTRA_LONG", mapLong[position]);
 				
-				Intent intent = new Intent(getActivity(), DetailActivity.class).putExtras(extras);
+				Intent intent = new Intent(getActivity(), SpecialDetailActivity.class).putExtras(extras);
 				startActivity(intent);
 			}
 		});
-
+		
 		return rootView;
 	}
 
@@ -140,6 +141,7 @@ public class SpecialsFragment extends Fragment
 	public class FetchSpecialsTask extends AsyncTask<String, Void, String[]> 
 	{
 		private final String LOG_TAG = FetchSpecialsTask.class.getSimpleName();
+		//private String[] restaurantList; 
 
 		/* The date/time conversion code is going to be moved outside the asynctask later,
 		 * so for convenience we're breaking it out into its own method now.
@@ -164,7 +166,7 @@ public class SpecialsFragment extends Fragment
 			String highLowStr = roundedHigh + "/" + roundedLow;
 			return highLowStr;
 		}
-
+		
 		private String[] getSpecialsFromJson(String jsonString) throws JSONException
 		{
 			final String OWM_RESTAURANT_NAME = "restaurant_name";
@@ -173,9 +175,10 @@ public class SpecialsFragment extends Fragment
 
 			String[] returnResult = new String[specialsJson.length()];
 			
-			mapLong = new double[specialsJson.length()];
-			mapLat = new double[specialsJson.length()];
-
+			//mapLong = new double[specialsJson.length()];
+			//mapLat = new double[specialsJson.length()];
+			restaurantList = new String[specialsJson.length()];
+			
 			for(int i = 0; i < specialsJson.length(); i ++)
 			{
 				JSONObject restaurantObject = specialsJson.getJSONObject(i);
@@ -183,14 +186,16 @@ public class SpecialsFragment extends Fragment
 
 				String restaurantName = restaurantObject.getString("restaurant");
 				restaurantName = Character.toUpperCase(restaurantName.charAt(0)) + restaurantName.substring(1);
+				restaurantList[i] =restaurantName;
 				
-				mapLat[i] = restaurantObject.getDouble("lat");
-				mapLong[i] = restaurantObject.getDouble("long");
+				//mapLat[i] = restaurantObject.getDouble("lat");
+				//mapLong[i] = restaurantObject.getDouble("long");
 
 				String price = restaurantDetailsArray.getString(0);
 				String descrip = restaurantDetailsArray.getString(1);
+				String availability = restaurantDetailsArray.getString(2);
 
-				returnResult[i] = "Restaurant: " + restaurantName + "\nPrice: R" + price + "\n" + descrip;
+				returnResult[i] = "Restaurant: " + restaurantName + "\nPrice: R" + price + "\n" + descrip + "\nAvailable: " + availability;
 
 				//Log.v(LOG_TAG, "Forecast entry: " + returnResult[i]);
 			}
@@ -220,7 +225,7 @@ public class SpecialsFragment extends Fragment
 			{
 				//Construct the query
 
-				final String SPECIAL_BASE_URL = "http://trackeroo-specials.appspot.com/";
+				final String SPECIAL_BASE_URL = "http://trackeroo-specials.appspot.com/specialpage";
 				final String DAY_PARAM = "day";
 				final String LOCATION_PARAM = "loc";
 
@@ -272,7 +277,7 @@ public class SpecialsFragment extends Fragment
 				}
 
 				specialJsonStr = buffer.toString();
-				Log.v(LOG_TAG, "Forecast string: " + specialJsonStr);
+				//Log.v(LOG_TAG, "Forecast string: " + specialJsonStr);
 			} 
 
 			catch (IOException e) 

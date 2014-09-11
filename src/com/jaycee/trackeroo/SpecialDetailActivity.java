@@ -15,46 +15,54 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
-public class DetailActivity extends Activity 
+public class SpecialDetailActivity extends Activity 
 {
-	private final String LOG_TAG = DetailActivity.class.getSimpleName();
+	private final String LOG_TAG = SpecialDetailActivity.class.getSimpleName();
 	
-	private double mapLong, mapLat;
+	private String restaurant;
+	//private double mapLong, mapLat;
 	
-	LocationManager locationManager;
+	//LocationManager locationManager;
 	
-	public void openMap(View view)
+	public void openRestDetail(View view)
 	{			
-		Location loc = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+		//Toast.makeText(this, restaurant, Toast.LENGTH_LONG).show();
+		
+		Intent intent = new Intent(this, RestaurantDetailActivity.class).putExtra("EXTRA_RESTAURANT", restaurant);
+		startActivity(intent);
+		//Location loc = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
 		//loc.getAccuracy();
 		
-		String uri = "http://maps.google.com/maps?daddr=" + String.valueOf(mapLat) + "," + String.valueOf(mapLong) + "&saddr=" + String.valueOf(loc.getLatitude()) + "," + String.valueOf(loc.getLongitude());
+		//String uri = "http://maps.google.com/maps?daddr=" + String.valueOf(mapLat) + "," + String.valueOf(mapLong) + "&saddr=" + String.valueOf(loc.getLatitude()) + "," + String.valueOf(loc.getLongitude());
 
-		Intent intent = new Intent(Intent.ACTION_VIEW);
-		intent.setData(Uri.parse(uri));
+		//Intent intent = new Intent(Intent.ACTION_VIEW);
+		//intent.setData(Uri.parse(uri));
 		
-		startActivity(intent);
+		//startActivity(intent);
 	}
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) 
 	{
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_detail);
+		setContentView(R.layout.activity_special_detail);
 		
 		Intent intent = this.getIntent();
         Bundle extras = intent.getExtras();
         
-        mapLong = extras.getDouble("EXTRA_LONG");
-        mapLat = extras.getDouble("EXTRA_LAT");
+        restaurant = extras.getString("EXTRA_RESTAURANT");
+        
+        //mapLong = extras.getDouble("EXTRA_LONG");
+        //mapLat = extras.getDouble("EXTRA_LAT");
 		
 		if (savedInstanceState == null) 
 		{
 			getFragmentManager().beginTransaction().add(R.id.container, new DetailFragment()).commit();
 		}
 		
-		locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
+		//locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
 	}
 
 	@Override
@@ -99,7 +107,7 @@ public class DetailActivity extends Activity
 		@Override
 		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) 
 		{
-			View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
+			View rootView = inflater.inflate(R.layout.fragment_special_detail, container, false);
 			
 			 // The detail Activity called via intent.  Inspect the intent for forecast data.
             Intent intent = getActivity().getIntent();

@@ -30,8 +30,12 @@
             android:label="@string/title_activity_settings" >
         </activity>
         <activity
-            android:name=".DetailActivity"
+            android:name=".SpecialDetailActivity"
             android:label="@string/title_activity_detail" >
+        </activity>
+        <activity
+            android:name=".RestaurantDetailActivity"
+            android:label="@string/title_activity_restaurant_detail" >
         </activity>
     </application>
 
