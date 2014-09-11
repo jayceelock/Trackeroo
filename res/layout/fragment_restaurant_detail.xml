@@ -8,8 +8,13 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.jaycee.trackeroo.RestaurantDetailActivity$PlaceholderFragment" >
 
+    <TextView 
+        android:id="@+id/textview_restaurant_detail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"   />
+        
     <ListView
-        android:id="@+id/listview_specials"
+        android:id="@+id/listview_restaurants"
         android:layout_height="match_parent"
         android:layout_width="match_parent" />
     

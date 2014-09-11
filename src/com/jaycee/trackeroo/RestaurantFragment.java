@@ -7,8 +7,6 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -31,7 +29,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.Toast;
+import android.widget.TextView;
 
 public class RestaurantFragment extends Fragment 
 {
@@ -50,38 +48,26 @@ public class RestaurantFragment extends Fragment
 	{
 		super.onCreate(savedInstanceState);
 		
-		setHasOptionsMenu(true);
+		//setHasOptionsMenu(true);
 	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) 
 	{
-		List<String> restaurantDetails = new ArrayList<String>();
-
-		ArrayAdapter<String> mRestaurantAdapter =
+		mRestaurantAdapter =
                 new ArrayAdapter<String>(
                     getActivity(), // The current context (this activity)
-                    R.layout.list_item_special, // The name of the layout ID.
-                    R.id.list_item_specials_textview, // The ID of the textview to populate.
-                    restaurantDetails);
+                    R.layout.list_item_restaurant, // The name of the layout ID.
+                    R.id.list_item_restaurant_textview, // The ID of the textview to populate.
+                    new ArrayList<String>());
 
         View rootView = inflater.inflate(R.layout.fragment_restaurant_detail, container, false);
 
         // Get a reference to the ListView, and attach this adapter to it.
-        ListView listView = (ListView) rootView.findViewById(R.id.listview_specials);
+        ListView listView = (ListView) rootView.findViewById(R.id.listview_restaurants);
         listView.setAdapter(mRestaurantAdapter);
         
         locationManager = (LocationManager)getActivity().getSystemService(Context.LOCATION_SERVICE);
-		
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-		String location = prefs.getString(getString(R.string.pref_location_key), getString(R.string.pref_location_default));
-		
-		Intent intent = getActivity().getIntent();
-		String restaurant = intent.getStringExtra("EXTRA_RESTAURANT");
-		
-		FetchRestaurantsTask fetchRestaurant = new FetchRestaurantsTask();
-		
-		fetchRestaurant.execute(restaurant, location);
 		
 		Button mButton = (Button)rootView.findViewById(R.id.detail_open_map);
 	    mButton.setOnClickListener(new OnClickListener() 
@@ -105,13 +91,32 @@ public class RestaurantFragment extends Fragment
 		return rootView;
 	}
 	
+	private void updateRestaurants()
+	{
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+		String location = prefs.getString(getString(R.string.pref_location_key), getString(R.string.pref_location_default));
+		
+		Intent intent = getActivity().getIntent();
+		String restaurant = intent.getStringExtra("EXTRA_RESTAURANT");
+		
+		FetchRestaurantsTask fetchRestaurant = new FetchRestaurantsTask();
+		
+		fetchRestaurant.execute(restaurant, location);
+	}
 	
-	public class FetchRestaurantsTask extends AsyncTask<String, Void, String[]> 
+	@Override
+	public void onStart()
+	{
+		super.onStart();
+		updateRestaurants();
+	}
+	
+	public class FetchRestaurantsTask extends AsyncTask<String, Void, String> 
 	{
 		private final String LOG_TAG = FetchRestaurantsTask.class.getSimpleName();
 
 		@Override
-		protected String[] doInBackground(String... params) 
+		protected String doInBackground(String... params) 
 		{
 			// If there's no zip code, there's nothing to look up. Verify size of params.
 			if (params.length == 0) 
@@ -151,7 +156,7 @@ public class RestaurantFragment extends Fragment
 				Log.v(LOG_TAG, "website: " + builtUri.toString());
 				if(urlConnection.getResponseCode() >= 400)
 				{
-					String[] badPage = {"Oops, could not find this restaurant on the server. The server is most likely down."};
+					String badPage = "Oops, could not find this restaurant on the server. The server is most likely down.";
 					return badPage;
 				}
 				
@@ -234,39 +239,68 @@ public class RestaurantFragment extends Fragment
 		}
 
 		@Override
-		protected void onPostExecute(String[] result) 
+		protected void onPostExecute(String result) 
 		{
 			Log.v(LOG_TAG, "Entering onPostExecute method");
 			//Toast.makeText(getActivity(), "Hello", Toast.LENGTH_LONG).show();
 			if (result != null) 
 			{
-				Log.v(LOG_TAG, "Im here");
-				mRestaurantAdapter.clear();
+				TextView restaurantDetailsText = (TextView)getActivity().findViewById(R.id.textview_restaurant_detail);
 				
-				for(String restaurantStr : result) 
-				{
-					mRestaurantAdapter.add(restaurantStr);
-				}
+				restaurantDetailsText.setText(result);
+				//int i = 0;
+				//Log.v(LOG_TAG, result[0].getClass().getName());
+				//mRestaurantAdapter.clear();
+				//Log.v(LOG_TAG, result[0]);
+				//Log.v(LOG_TAG, result[1]);
+				
+				//Log.v(LOG_TAG, String.valueOf(i++) + restaurantStr);
+				//mRestaurantAdapter.add(result);
+				
 				// New data is back from the server. Hooray!
 			}
 		}
 		
-		private String[] getRestaurantsFromJson(String jsonString) throws JSONException
+		private String getRestaurantsFromJson(String jsonString) throws JSONException
 		{
 			JSONObject restaurantObject = new JSONObject(jsonString);
+			JSONObject extrasObject = restaurantObject.getJSONObject("extras");
 			
 			String latitude = restaurantObject.getString("lat");
 			String longitude = restaurantObject.getString("long");
+			String description = restaurantObject.getString("description");
+			String address = restaurantObject.getString("address");
+			String telnumber = restaurantObject.getString("telnumber");
+			String email = restaurantObject.getString("email");
+			String website = restaurantObject.getString("website");
+			String operatingHours = restaurantObject.getString("operating_hours");
+			String wifi = extrasObject.getString("wifi");
 			
 			Log.v(LOG_TAG, latitude);
 			
+			/*
 			String[] returnResult = new String[restaurantObject.length()];
 			
 			returnResult[0] = latitude;
 			returnResult[1] = longitude;
-			
+			returnResult[2] = description;
+			returnResult[3] = address;
+			returnResult[4] = telnumber;
+			returnResult[5] = email;
+			returnResult[6] = website;
+			returnResult[7] = operatingHours;
+			returnResult[8] = wifi;
+			*/
 			restaurantLatitude = latitude;
 			restuarantLongitude = longitude;
+			
+			String returnResult = "Description:    " + description + 
+								  "\nAddress:		   " + address		+
+								  "\nTelephone nr:   " + telnumber + 
+								  "\nEmail:		   " + email + 
+								  "\nWebsite:		   " + website + 
+								  "\nOperating hours:" + operatingHours + 
+								  "\nWiFi			   " + wifi;
 			
 			Log.v(LOG_TAG, "Lat and long:  " + restaurantLatitude + " " + longitude);
 			
