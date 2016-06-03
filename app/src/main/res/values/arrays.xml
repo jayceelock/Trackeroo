@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="pref_days_options">
+        <item>@string/pref_day_label_monday</item>
+        <item>@string/pref_day_label_tuesday</item>
+        <item>@string/pref_day_label_wednesday</item>
+        <item>@string/pref_day_label_thursday</item>
+        <item>@string/pref_day_label_friday</item>
+        <item>@string/pref_day_label_saturday</item>
+        <item>@string/pref_day_label_sunday</item>
+    </string-array>
+
+    <string-array name="pref_days_values">
+        <item>@string/pref_day_label_monday</item>
+        <item>@string/pref_day_label_tuesday</item>
+        <item>@string/pref_day_label_wednesday</item>
+        <item>@string/pref_day_label_thursday</item>
+        <item>@string/pref_day_label_friday</item>
+        <item>@string/pref_day_label_saturday</item>
+        <item>@string/pref_day_label_sunday</item>
+    </string-array>
+</resources>
